@@ -68,20 +68,19 @@ The application provides a Streamlit interface where users can submit queries re
 ## Evaluation
 
 1. **What are the permissible purposes for which a consumer reporting agency may furnish a consumer report?**
-- Explanation: This question tests the system’s ability to identify and explain the legal basis under which consumer reports can be accessed and used, as specified in the FCRA.
+    - Explanation: This question tests the system’s ability to identify and explain the legal basis under which consumer reports can be accessed and used, as specified in the FCRA.
 
 2. **How does the FCRA regulate the use of consumer reports in prescreening for credit and insurance offers?**
-- Explanation: Aims to evaluate the system’s understanding of the regulatory framework governing the use of consumer reports in making prequalified offers of credit or insurance.
+    - Explanation: Aims to evaluate the system’s understanding of the regulatory framework governing the use of consumer reports in making prequalified offers of credit or insurance.
 
 3. **What are the obligations of users under the FCRA when they take adverse actions based on consumer reports?**
-- Explanation: Tests the system’s ability to detail the responsibilities and required actions (e.g., notifications) of entities that use consumer reports for decisions that negatively affect consumers.
+    - Explanation: Tests the system’s ability to detail the responsibilities and required actions (e.g., notifications) of entities that use consumer reports for decisions that negatively affect consumers.
 
 4. **What steps must be taken when there is a notice of address discrepancy in consumer reports as per the FCRA?**
-- Explanation: Evaluates how well the system can outline the procedures that must be followed to address discrepancies in consumer addresses as reported by consumer reporting agencies.
+    - Explanation: Evaluates how well the system can outline the procedures that must be followed to address discrepancies in consumer addresses as reported by consumer reporting agencies.
 
 5. **What measures should be implemented to manage and dispose of consumer information securely according to the FCRA?**
-- Explanation: Checks the system’s knowledge on the secure disposal and management of consumer information to prevent unauthorized access and fraud.
-
+    - Explanation: Checks the system’s knowledge on the secure disposal and management of consumer information to prevent unauthorized access and fraud.
 
 
 ## Conclusion
