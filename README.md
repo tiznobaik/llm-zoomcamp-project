@@ -65,6 +65,25 @@ The application provides a Streamlit interface where users can submit queries re
 - User Interface: Designed with Streamlit, the interface offers a clean, intuitive way for users to interact with the model, enhancing user experience and engagement.
 - Deployment: Hosted on a GCP VM, the system is set up for high reliability and continuous access, facilitating ongoing user interaction.
 
+## Evaluation
+
+1. **What are the permissible purposes for which a consumer reporting agency may furnish a consumer report?**
+- Explanation: This question tests the system’s ability to identify and explain the legal basis under which consumer reports can be accessed and used, as specified in the FCRA.
+
+2. **How does the FCRA regulate the use of consumer reports in prescreening for credit and insurance offers?**
+- Explanation: Aims to evaluate the system’s understanding of the regulatory framework governing the use of consumer reports in making prequalified offers of credit or insurance.
+
+3. **What are the obligations of users under the FCRA when they take adverse actions based on consumer reports?**
+- Explanation: Tests the system’s ability to detail the responsibilities and required actions (e.g., notifications) of entities that use consumer reports for decisions that negatively affect consumers.
+
+4. **What steps must be taken when there is a notice of address discrepancy in consumer reports as per the FCRA?**
+- Explanation: Evaluates how well the system can outline the procedures that must be followed to address discrepancies in consumer addresses as reported by consumer reporting agencies.
+
+5. **What measures should be implemented to manage and dispose of consumer information securely according to the FCRA?**
+- Explanation: Checks the system’s knowledge on the secure disposal and management of consumer information to prevent unauthorized access and fraud.
+
+
+
 ## Conclusion
 
 This LLM-RAG project represents a significant advancement in the application of NLP techniques to legal compliance. By simplifying the interpretation and application of FCRA regulations, the system serves as a crucial tool for users ranging from legal experts to financial institutions, ensuring they can more easily meet regulatory requirements.
