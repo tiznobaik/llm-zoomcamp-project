@@ -28,6 +28,31 @@ index_name = 'fcra_chunks'
 # Ensure the Elasticsearch index exists
 if not es.indices.exists(index=index_name):
     st.error("Elasticsearch index not found! Please index the documents.")
+        # Delete the index if it already exists (optional)
+    if es.indices.exists(index=index_name):
+        es.indices.delete(index=index_name)
+
+    # Define the mapping
+    mapping = {
+        "mappings": {
+            "properties": {
+                "embedding": {
+                    "type": "dense_vector",
+                    "dims": 1536
+                },
+                "text": {
+                    "type": "text"
+                },
+                "metadata": {
+                    "type": "object",
+                    "enabled": True
+                }
+            }
+        }
+    }
+
+    # Create the index with the mapping
+    es.indices.create(index=index_name, body=mapping)
 
 
 # Input box for user query
