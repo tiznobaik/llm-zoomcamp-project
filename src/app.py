@@ -18,7 +18,7 @@ st.title("FCRA Query System")
 st.write("Welcome! You can ask questions related to the FCRA.")
 
 # Load saved embeddings and metadata
-with open('document_embeddings.json', 'r') as f:
+with open('src/document_embeddings.json', 'r') as f:
     saved_data = json.load(f)
 
 # Initialize Elasticsearch connection

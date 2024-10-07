@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "llm-zoomcamp-project"
+version = "0.1.0"
+description = ""
+authors = ["Hani Tiznobaik <h.tiznobaik.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+spacy = ">=3.0.0,<3.8.2"
+streamlit = "^1.39.0"
+elasticsearch = "^8.15.1"
+langchain-community = "^0.3.1"
+watchdog = "^5.0.3"
+langchain = "^0.3.2"
+notebook = "^7.2.2"
+openai = "^1.51.0"
+tiktoken = "^0.8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
