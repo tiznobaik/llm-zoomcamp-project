@@ -1,4 +1,4 @@
-# README: LLM-RAG System for FCRA Compliance
+# LLM-RAG System for FCRA Compliance
 
 ## Overview
 
@@ -10,20 +10,20 @@ Understanding and implementing FCRA regulations can be challenging due to the co
 
 ## Project Components
 
-	•	Text Files: Original FCRA documents used as the primary data source for the project, converted into textual format for processing.
-	•	JSON Files: These files represent chunked and embedded versions of the text documents, optimized for efficient information retrieval within the RAG system.
-	•	Notebook (01.preprocessing.ipynb): Contains the preprocessing steps to transform text data into a searchable format, preparing it for use in the retrieval system.
-	•	Source Code (app.py): The final application script that integrates the RAG system, enabling user interaction with the FCRA knowledge base through queries.
+- Text Files: Original FCRA documents used as the primary data source for the project, converted into textual format for processing.
+- JSON Files: These files represent chunked and embedded versions of the text documents, optimized for efficient information retrieval within the RAG system.
+- Notebook (01.preprocessing & rag.ipynb, 02.reused_embeded_data_rag.ipynb): Contains the preprocessing steps to transform text data into a searchable format, preparing it for use in the retrieval system.
+- Source Code (app.py): The final application script that integrates the RAG system, enabling user interaction with the FCRA knowledge base through queries.
 
 ## Setup and Installation
 
-	1.	Dependencies: Python dependencies are managed using Poetry. Install the necessary packages by running:
+1. Dependencies: Python dependencies are managed using Poetry. Install the necessary packages by running:
 
-    ```bash
-    poetry install
-    ```
+```bash
+poetry install
+```
 	
-    2.	Elasticsearch Setup: The project utilizes Elasticsearch for handling vector-based search operations. Set up the Elasticsearch service using Docker with the following command:
+2. Elasticsearch Setup: The project utilizes Elasticsearch for handling vector-based search operations. Set up the Elasticsearch service using Docker with the following command:
     
 ```bash
     docker run -d \
@@ -39,20 +39,20 @@ Understanding and implementing FCRA regulations can be challenging due to the co
 ```
     This setup ensures that Elasticsearch operates in a single-node configuration with security features disabled for simplicity, and it restarts automatically unless manually stopped.
 
-	3.	Running the Notebook: Process the data through the preprocessing notebook:
+3. Running the Notebook: Process the data through the preprocessing notebook:
 
 ```bash
 poetry run jupyter notebook 01.preprocessing.ipynb
 ```
 
-	4.	Running the Application: The Streamlit-based application can be started with:
+4. Running the Application: The Streamlit-based application can be started with:
 
 ```bash
 poetry run streamlit run app.py
 ```
     This command initializes the user interface, allowing for interactive query processing.
 
-	5.	Deployment: The application is deployed directly on a GCP VM, ensuring robust performance and availability. Access the live application via: http://34.71.24.6:8501
+5. Deployment: The application is deployed directly on a GCP VM, ensuring robust performance and availability. Access the live application via: http://34.71.24.6:8501
 
 
 ## Functionality
@@ -61,9 +61,9 @@ The application provides a Streamlit interface where users can submit queries re
 
 ## Features
 
-	•	Advanced Search: Incorporates vector-based searching for high precision and relevance in response generation.
-	•	User Interface: Designed with Streamlit, the interface offers a clean, intuitive way for users to interact with the model, enhancing user experience and engagement.
-	•	Deployment: Hosted on a GCP VM, the system is set up for high reliability and continuous access, facilitating ongoing user interaction.
+- Advanced Search: Incorporates vector-based searching for high precision and relevance in response generation.
+- User Interface: Designed with Streamlit, the interface offers a clean, intuitive way for users to interact with the model, enhancing user experience and engagement.
+- Deployment: Hosted on a GCP VM, the system is set up for high reliability and continuous access, facilitating ongoing user interaction.
 
 ## Conclusion
 
