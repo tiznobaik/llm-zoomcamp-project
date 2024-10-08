@@ -52,7 +52,7 @@ poetry run streamlit run app.py
 ```
     This command initializes the user interface, allowing for interactive query processing.
 
-5. Deployment: The application is deployed directly on a GCP VM, ensuring robust performance and availability. Access the live application via: http://34.27.229.3:8501
+5. Deployment: The application is deployed directly on a GCP VM, ensuring robust performance and availability. Access the live application via: http://35.208.255.123:8501/
 
 
 ## Functionality
