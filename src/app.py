@@ -4,6 +4,7 @@ import numpy as np
 from elasticsearch import Elasticsearch
 from langchain.llms import OpenAI
 from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from dotenv import load_dotenv
 from langchain.embeddings import OpenAIEmbeddings
@@ -13,6 +14,7 @@ from langchain.schema import BaseRetriever
 from typing import Any, List
 import numpy as np
 from pydantic import BaseModel
+
 
 st.title("FCRA Query System")
 st.write("Welcome! You can ask questions related to the FCRA.")
@@ -73,8 +75,10 @@ load_dotenv()
 # Initialize the embedding model with the API key
 embedding_model = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
-# Create a Custom Retriever Using Elasticsearch
+# Initialize the LLM (GPT)
+llm = OpenAI(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
+# Create a Custom Retriever Using Elasticsearch
 class ElasticSearchRetriever(BaseRetriever, BaseModel):
     es: Any
     index_name: str
@@ -127,14 +131,26 @@ retriever = ElasticSearchRetriever(
     k=5  # Number of documents to retrieve
 )
 
-# Initialize the LLM (GPT)
-llm = OpenAI(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
-# Create the RetrievalQA chain
+# Define a custom prompt template that encourages the model to use only the retrieved documents
+prompt_template = """
+You are a helpful assistant that answers questions based only on the following documents:
+
+{context}
+
+If the answer is not in the documents, respond with "I don't know based on the information provided."
+Question: {question}
+"""
+
+# Create a prompt object using the custom prompt template
+prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+
+
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm, 
-    chain_type="stuff",  # You can change to map_reduce, etc.
-    retriever=retriever
+    chain_type="stuff",
+    retriever=retriever,
+    chain_type_kwargs={"prompt": prompt}
 )
 
 # If query is entered, process it and get the answer
