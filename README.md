@@ -35,9 +35,10 @@ poetry install
     -e "xpack.security.enabled=false" \
     -v esdata:/usr/share/elasticsearch/data \
     --restart unless-stopped \
-    docker.elastic.co/elasticsearch/elasticsearch:8.5.1```
+    docker.elastic.co/elasticsearch/elasticsearch:8.5.1
 ```
-    This setup ensures that Elasticsearch operates in a single-node configuration with security features disabled for simplicity, and it restarts automatically unless manually stopped.
+
+- This setup ensures that Elasticsearch operates in a single-node configuration with security features disabled for simplicity, and it restarts automatically unless manually stopped.
 
 3. Running the Notebook: Process the data through the preprocessing notebook:
 
@@ -50,7 +51,7 @@ poetry run jupyter notebook 01.preprocessing.ipynb
 ```bash
 poetry run streamlit run app.py
 ```
-    This command initializes the user interface, allowing for interactive query processing.
+- This command initializes the user interface, allowing for interactive query processing.
 
 5. Deployment: The application is deployed directly on a GCP VM, ensuring robust performance and availability. Access the live application via: http://35.208.255.123:8501/
 

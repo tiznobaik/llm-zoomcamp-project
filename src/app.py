@@ -14,6 +14,7 @@ from langchain.schema import BaseRetriever
 from typing import Any, List
 import numpy as np
 from pydantic import BaseModel
+from elasticsearch.helpers import bulk
 
 
 st.title("FCRA Query System")
@@ -23,17 +24,31 @@ st.write("Welcome! You can ask questions related to the FCRA.")
 with open('src/document_embeddings.json', 'r') as f:
     saved_data = json.load(f)
 
+# Convert the embeddings back to numpy arrays (if needed)
+texts = []
+embeddings = []
+metadatas = []
+
+for item in saved_data:
+    texts.append(item['text'])
+    embeddings.append(np.array(item['embedding']))  # Convert back to numpy array
+    metadatas.append(item['metadata'])
+
+#  Load environment variables
+load_dotenv()
+
+# Initialize the embedding model with the API key
+embedding_model = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
+
 # Initialize Elasticsearch connection
 es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
+
+# Define the Elasticsearch index name
 index_name = 'fcra_chunks'
 
 # Ensure the Elasticsearch index exists
 if not es.indices.exists(index=index_name):
-    st.error("Elasticsearch index not found! Please index the documents.")
-        # Delete the index if it already exists (optional)
-    if es.indices.exists(index=index_name):
-        es.indices.delete(index=index_name)
-
+    st.error("Elasticsearch index not found! Indexing the documents.")
     # Define the mapping
     mapping = {
         "mappings": {
@@ -56,6 +71,23 @@ if not es.indices.exists(index=index_name):
     # Create the index with the mapping
     es.indices.create(index=index_name, body=mapping)
 
+    # Prepare actions for bulk indexing
+    actions = [
+        {
+            "_index": index_name,
+            "_id": str(i),
+            "_source": {
+                "embedding": embedding.tolist(),  # Convert numpy array to list
+                "text": text,
+                "metadata": metadata
+            }
+        }
+        for i, (embedding, text, metadata) in enumerate(zip(embeddings, texts, metadatas))
+    ]
+
+    # Bulk index the documents
+    bulk(es, actions)
+
 
 # Input box for user query
 query = st.text_input("Enter your question related to the FCRA:", "")
@@ -69,11 +101,6 @@ if st.button("Get Answer"):
     else:
         st.error("Please enter a query.")
 
-#  Load environment variables
-load_dotenv()
-
-# Initialize the embedding model with the API key
-embedding_model = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 # Initialize the LLM (GPT)
 llm = OpenAI(openai_api_key=os.getenv("OPENAI_API_KEY"))
