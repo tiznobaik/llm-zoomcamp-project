@@ -87,10 +87,35 @@ if not es.indices.exists(index=index_name):
     bulk(es, actions)
 
 # Add a dropdown for selecting question type
-question_type = st.selectbox("Select Question Type", ["Simple Question", "True/False"])
+question_type = st.selectbox("Select Question Type", ["Simple Question", "True/False", "Multiple Choice"])
+
+# Initialize session state for options
+if 'options' not in st.session_state:
+    st.session_state.options = ['']
 
 # Input box for user query
-query = st.text_input("Enter your question related to the FCRA:", "")
+if question_type == "Multiple Choice":
+    query = st.text_input("Enter your multiple-choice question related to the FCRA:", "")
+
+    # Function to add a new option
+    def add_option():
+        st.session_state.options.append('')
+
+    st.write("Enter your options:")
+    for i in range(len(st.session_state.options)):
+        st.session_state.options[i] = st.text_input(f"Option {i + 1}:", st.session_state.options[i], key=f"option_{i}")
+
+    # Buttons to add or remove options
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Add Option", on_click=add_option)
+    with col2:
+        if len(st.session_state.options) > 1:
+            def remove_option():
+                st.session_state.options.pop()
+            st.button("Remove Last Option", on_click=remove_option)
+else:
+    query = st.text_input("Enter your question related to the FCRA:", "")
 
 # Button to trigger the query
 if st.button("Get Answer"):
@@ -100,7 +125,13 @@ if st.button("Get Answer"):
             formatted_query = query
         elif question_type == "True/False":
             formatted_query = f"{query}\nIs this statement True or False?"
-        
+        elif question_type == "Multiple Choice":
+            # Include the options in the query
+            options_text = ""
+            for idx, option_text in enumerate(st.session_state.options):
+                if option_text.strip() != "":
+                    options_text += f"{idx + 1}. {option_text}\n"
+            formatted_query = f"{query}\nOptions:\n{options_text}"
         # Process the query
         st.write(f"Processing query: {formatted_query}")
     else:
@@ -172,7 +203,8 @@ if question_type == "Simple Question":
     If the answer is not in the documents, respond with "I don't know based on the information provided."
     Question: {question}
     """
-else:
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+elif question_type == "True/False":
     prompt_template = """
     You are a helpful assistant answering only based on the following documents:
 
@@ -180,16 +212,37 @@ else:
 
     Statement: {question}
 
-    Answer "True" or "False" **and provide a brief explanation** based only on the provided documents. Do not use any knowledge outside the documents. 
+    Answer "True" or "False" and provide a brief explanation based only on the provided documents. Do not use any knowledge outside the documents.
     If the answer cannot be determined based on these documents alone, respond with "I don't know based on the information provided."
     """
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+elif question_type == "Multiple Choice":
+    prompt_template = """
+    You are a helpful assistant that answers questions based strictly on the following documents:
 
-# Create a prompt object using the custom prompt template
-prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+    {context}
+
+    Question:
+    {question}
+
+    Instructions:
+    - Choose the most appropriate option (e.g., 1, 2, 3, ...) based only on the information in the documents.
+    - If the answer cannot be determined from the documents, respond with "I don't know based on the information provided."
+    - Do not use any prior knowledge or external information.
+    - Provide a brief explanation citing the relevant parts of the documents that support your answer.
+
+    Your answer should be in the following format:
+
+    Answer: [Option Number]
+    Explanation: [Your brief explanation based on the documents.]
+
+    Remember, if the answer cannot be determined from the documents, you must respond with "I don't know based on the information provided."
+    """
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
 # Create the QA chain
 qa_chain = RetrievalQA.from_chain_type(
-    llm=llm, 
+    llm=llm,
     chain_type="stuff",
     retriever=retriever,
     chain_type_kwargs={"prompt": prompt}
@@ -199,7 +252,7 @@ if query:
     with st.spinner("Retrieving answer..."):
         # Retrieve relevant documents
         docs = retriever.get_relevant_documents(formatted_query)
-        
+
         # Check if relevant documents were retrieved
         if not docs:
             st.success("Answer: I don't know based on the information provided.")
@@ -207,42 +260,48 @@ if query:
             # Run the query using the LLM chain
             answer = qa_chain.run(formatted_query)
 
+            # Function to parse the LLM's answer
+            def parse_answer(answer):
+                if "I don't know based on the information provided" in answer:
+                    return "I don't know based on the information provided.", ""
+                else:
+                    # Split the answer into Answer and Explanation
+                    answer_parts = answer.strip().split('Explanation:', 1)
+                    answer_line = answer_parts[0].replace('Answer:', '').strip()
+                    explanation = answer_parts[1].strip() if len(answer_parts) > 1 else ""
+
+                    # Extract option number from answer_line
+                    selected_option = answer_line.strip()
+                    # Ensure the selected option is a valid number
+                    if selected_option.isdigit():
+                        return selected_option, explanation
+                    else:
+                        return "I don't know based on the information provided.", ""
+
             # Post-process the answer
-            if "I don't know based on the information provided" in answer:
+            selected_option, explanation = parse_answer(answer)
+            if selected_option == "I don't know based on the information provided.":
                 st.success("Answer: I don't know based on the information provided.")
             else:
-                # Split the answer into True/False and explanation
-                answer_lines = answer.strip().split('\n', 1)
-                if len(answer_lines) == 2:
-                    tf_answer, explanation = answer_lines
+                if question_type == "Multiple Choice":
+                    option_numbers = [str(i + 1) for i in range(len(st.session_state.options))]
+                    if selected_option in option_numbers:
+                        st.success(f"Answer: Option {selected_option}")
+                        st.write(f"Explanation: {explanation}")
+                    else:
+                        st.success("Answer: I don't know based on the information provided.")
                 else:
-                    tf_answer = answer.strip()
-                    explanation = ""
-                
-                # Display the answer and explanation
-                st.success(f"Answer: {tf_answer}")
-                if explanation:
-                    st.write(f"Explanation: {explanation}")
-
-# # If query is entered, process it and get the answer
-# if query:
-#     with st.spinner("Retrieving answer..."):
-#         answer = qa_chain.run(formatted_query)
-
-#         # Check if the answer contains "I don't know" and format the output accordingly
-#         if "I don't know based on the information provided" in answer:
-#             st.success("Answer: I don't know based on the information provided.")
-#         elif answer.strip().lower() in ["true", "false"]:
-#             st.success(f"Answer: {answer}")
-#         else:
-#             st.success("Answer: I don't know based on the information provided.")
+                    st.success(f"Answer: {selected_option}")
+                    if explanation:
+                        st.write(f"Explanation: {explanation}")
 
 st.sidebar.title("About")
 st.sidebar.info("This app allows you to query the Fair Credit Reporting Act (FCRA) content and get answers using GPT-3 and Elasticsearch.")
 
 st.markdown("""
 ### How to use:
-1. Select the question type (Simple Question or True/False).
+1. Select the question type (Simple Question, True/False, or Multiple Choice).
 2. Enter your question related to the FCRA in the input box.
-3. Click 'Get Answer' to retrieve the response.
+3. For Multiple Choice questions, add options using the 'Add Option' button and enter the option texts.
+4. Click 'Get Answer' to retrieve the response.
 """)
